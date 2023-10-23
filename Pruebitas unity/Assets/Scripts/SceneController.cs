@@ -6,6 +6,7 @@ public class SceneController : MonoBehaviour
 {
     private Vector2 playerMapPos;
     private bool hasEnter = false;
+    public bool paused = false;
 
     public static SceneController instance;
 
@@ -31,7 +32,6 @@ public class SceneController : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("cargo correctamente");
         if(SceneController.instance == null){
             SceneController.instance = this;
             DontDestroyOnLoad(this.gameObject);

@@ -10,7 +10,7 @@ public class PMovement : MonoBehaviour
     public float MoveForce;
 
     private BoxCollider2D coll;
-    private Rigidbody2D rigidbody;
+    private Rigidbody2D rigidBd;
     private Animator anim;
     private SpriteRenderer spRender;
 
@@ -29,7 +29,7 @@ public class PMovement : MonoBehaviour
     private void Start()
     {
         coll = GetComponent<BoxCollider2D>();
-        rigidbody = GetComponent<Rigidbody2D>();
+        rigidBd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spRender = GetComponent<SpriteRenderer>();
         if(position)
@@ -42,18 +42,21 @@ public class PMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        //GetAxixRaw provoca que se reinicie a 0 (de Input.GetAxis("Horizontal")) cuando deje de pulsarse. Esto hace que el personaje se pare en seco al dejar de moverse
-        dirX = Input.GetAxis("Horizontal");
-
-        rigidbody.velocity = new Vector2(dirX * MoveForce, rigidbody.velocity.y);
-
-        if (Input.GetButtonDown("Jump") && isGrounded())
+        if (!SceneController.instance.paused)
         {
-            rigidbody.velocity = new Vector2(rigidbody.velocity.x, JumpForce);
-            jumpSound.Play(); 
-        }
+            //GetAxixRaw provoca que se reinicie a 0 (de Input.GetAxis("Horizontal")) cuando deje de pulsarse. Esto hace que el personaje se pare en seco al dejar de moverse
+            dirX = Input.GetAxis("Horizontal");
 
-        UpdateAnim();
+            rigidBd.velocity = new Vector2(dirX * MoveForce, rigidBd.velocity.y);
+
+            if (Input.GetButtonDown("Jump") && isGrounded())
+            {
+                rigidBd.velocity = new Vector2(rigidBd.velocity.x, JumpForce);
+                jumpSound.Play();
+            }
+
+            UpdateAnim();
+        }
         
     }
 
@@ -76,10 +79,10 @@ public class PMovement : MonoBehaviour
             state = MoveState.idle;
         }
 
-        if(System.Math.Abs(rigidbody.velocity.y) > 0.01f)
+        if(System.Math.Abs(rigidBd.velocity.y) > 0.01f)
         {
             anim.SetBool("Grounded", false);
-            anim.SetFloat("AirSpeed", rigidbody.velocity.y);
+            anim.SetFloat("AirSpeed", rigidBd.velocity.y);
         }
         else
         {

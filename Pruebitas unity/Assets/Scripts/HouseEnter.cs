@@ -38,13 +38,15 @@ public class HouseEnter : MonoBehaviour
                     SceneController.instance.SetHasEnter(true);
                     ChangeLevel();
                 }
+                if (exit)
+                {
+                    PMovement.position = true;
+                    doorSound.Play();
+                    SceneController.instance.SetHasEnter(true);
+                    ChangeLevel();
+                }
             }
-            if (exit)
-            {
-                PMovement.position = true;
-                doorSound.Play();
-                ChangeLevel();
-            }
+            
         }
     }
 
@@ -52,10 +54,7 @@ public class HouseEnter : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            if (exit == false)
-            {
-                SceneController.instance.SetHasEnter(false);
-            }
+            SceneController.instance.SetHasEnter(false);
         }
     }
 
