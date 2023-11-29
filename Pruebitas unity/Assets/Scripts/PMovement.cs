@@ -8,6 +8,9 @@ public class PMovement : MonoBehaviour
     //Usando [SerializeField] private, hacemos que la variable sea aun accesible desde el editor de unity pero no accesible desde otras clases/scripts
     public float JumpForce;
     public float MoveForce;
+    public float ClimbForce;
+
+    public bool climbing = false;
 
     private BoxCollider2D coll;
     private Rigidbody2D rigidBd;
@@ -17,17 +20,20 @@ public class PMovement : MonoBehaviour
     public static bool position;
     
     float dirX = 0f;
+    float dirY = 0f;
 
     [SerializeField] private LayerMask ground;
 
     [SerializeField] private AudioSource jumpSound;
     private enum MoveState {idle, combat, run}
+    private Vector3 lScale;
 
 
 
     // Start is called before the first frame update
     private void Start()
     {
+        lScale = transform.localScale;
         coll = GetComponent<BoxCollider2D>();
         rigidBd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -46,8 +52,17 @@ public class PMovement : MonoBehaviour
         {
             //GetAxixRaw provoca que se reinicie a 0 (de Input.GetAxis("Horizontal")) cuando deje de pulsarse. Esto hace que el personaje se pare en seco al dejar de moverse
             dirX = Input.GetAxis("Horizontal");
+            dirY = Input.GetAxis("Vertical");
 
-            rigidBd.velocity = new Vector2(dirX * MoveForce, rigidBd.velocity.y);
+            if(climbing == true)
+            {
+                rigidBd.velocity = new Vector2(dirX * ClimbForce, dirY * ClimbForce);
+            }
+            else
+            {
+                rigidBd.velocity = new Vector2(dirX * MoveForce, rigidBd.velocity.y);
+            }
+            
 
             if (Input.GetButtonDown("Jump") && isGrounded())
             {
@@ -66,12 +81,12 @@ public class PMovement : MonoBehaviour
 
         if (dirX > 0f)
         {
-            spRender.flipX = true;
+            transform.localScale = new Vector3(-lScale.x, lScale.y, lScale.z);
             state = MoveState.run;
         }
         else if (dirX < 0f)
         {
-            spRender.flipX = false;
+            transform.localScale = new Vector3(lScale.x, lScale.y, lScale.z);
             state = MoveState.run;
         }
         else //if(dirX == 0)
@@ -79,7 +94,7 @@ public class PMovement : MonoBehaviour
             state = MoveState.idle;
         }
 
-        if(System.Math.Abs(rigidBd.velocity.y) > 0.01f)
+        if(System.Math.Abs(rigidBd.velocity.y) > 0.05f)
         {
             anim.SetBool("Grounded", false);
             anim.SetFloat("AirSpeed", rigidBd.velocity.y);

@@ -14,16 +14,39 @@ public class HouseEnter : MonoBehaviour
         doorSound = GetComponent<AudioSource>();
     }
 
-    /*private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            SceneController.instance.playerLastPos = collision.gameObject.transform;
-            doorSound.Play();
-            ChangeLevel();
-        }
-    }*/
 
+            if (SceneController.instance.GetHasEnter() == false)
+            {
+                if (exit == false)
+                {
+                    SceneController.instance.SetplayerMapPos(collision.gameObject.transform.position);
+                    doorSound.Play();
+                    SceneController.instance.SetHasEnter(true);
+                    ChangeLevel();
+                }
+                if (exit)
+                {
+                    PMovement.position = true;
+                    doorSound.Play();
+                    SceneController.instance.SetHasEnter(true);
+                    ChangeLevel();
+                }
+            }
+
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            SceneController.instance.SetHasEnter(false);
+        }
+    }
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))

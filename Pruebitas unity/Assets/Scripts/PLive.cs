@@ -10,12 +10,12 @@ public class PLive : MonoBehaviour
     private Animator anim;
     private Rigidbody2D rb;
     [SerializeField] private Image heart;
-    //[SerializeField] private Canvas canvas;
     private Image[] heartArray;
+    private bool vulnerable = true;
 
     [SerializeField] private AudioSource deathSound;
-
-    private int maxHealth, health;
+    public int health;
+    public int maxHealth = 3;
 
     // Start is called before the first frame update
     private void Start()
@@ -23,13 +23,12 @@ public class PLive : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         
-        maxHealth = 3;
         health = maxHealth;
-        heartArray = new Image[maxHealth];
+        heartArray = new Image[health];
 
-        for(int i = 0; i < maxHealth; i++)
+        for (int i = 0; i < health; i++)
         {
-            if(i == 0)
+            if (i == 0)
             {
                 heartArray[i] = heart;
             }
@@ -37,10 +36,13 @@ public class PLive : MonoBehaviour
             {
                 Transform tr = heart.transform.parent;
                 heartArray[i] = Instantiate(heart, tr);
-                heartArray[i].transform.position = new Vector2(heartArray[i].transform.position.x + 50*i, heartArray[i].transform.position.y);
+                heartArray[i].transform.position = new Vector2(heartArray[i].transform.position.x + 50 * i, heartArray[i].transform.position.y);
             }
-            //heartArray[i].transform.parent = canvas.transform;
         }
+    }
+    private void Update()
+    {
+        
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -59,15 +61,26 @@ public class PLive : MonoBehaviour
         }
     }
 
-    private void Hurt()
+    public void Hurt()
     {
-        health--;
-        heartArray[health].enabled = false;
-        anim.SetTrigger("Hurt");
-        if (health <= 0)
+        if (vulnerable)
         {
-            Die();
+            vulnerable = false;
+            health--;
+            anim.SetTrigger("Hurt");
+            heartArray[health].enabled = false;
+            if (health <= 0)
+            {
+                Die();
+            }
         }
+        StartCoroutine(Cooldown(1f));
+    }
+
+    IEnumerator Cooldown(float time)
+    {
+        yield return new WaitForSecondsRealtime(time);
+        vulnerable = true;
     }
 
     private void Die()
@@ -79,7 +92,6 @@ public class PLive : MonoBehaviour
 
     private void RestartLevel()
     {
-        Debug.Log("entro xd");
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }   
